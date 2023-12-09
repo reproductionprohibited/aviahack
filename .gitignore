@@ -138,6 +138,8 @@ venv.bak/
 # mkdocs documentation
 /site
 
+/waverange/data
+
 # mypy
 .mypy_cache/
 .dmypy.json
