@@ -1,14 +1,8 @@
-from functools import wraps
 from pathlib import Path
 from typing import Union, List, Dict
-import os
-import json
-from multiprocessing import Pool
-from pprint import pprint
 
 import numpy as np
 import openfoamparser_mai as Ofpp
-import pyvista
 
 
 class VelParser:
@@ -40,12 +34,29 @@ class VelParser:
             veldata[key] = [p, t, u, rho]
         return veldata
 
+    def get_vels(
+        self,
+        model: str,
+        base_path: str,
+        dimpath: str,
+    ) -> List[str]:
+        parsepath = Path(
+            '/'.join([
+                base_path,
+                model,
+                dimpath,
+            ])
+        )
+        children = parsepath.iterdir()
+        vels = list(filter(lambda x: 'vel' in str(x), children))
+        return vels
+
     def get_all_dim_data(
         self,
         model: str,
         base_path: str = 'data',
         dimpath: str = 'low_dim',
-    ) -> Dict[str, Union(Dict[str, List[np.ndarray]]) | List[np.ndarray]]:
+    ):
         parsepath = Path(
             '/'.join([
                 base_path,
