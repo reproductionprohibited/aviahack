@@ -1,13 +1,15 @@
 import numpy as np
 from math import log2
 
+from pprint import pprint
+
 
 class Quantizator:
     def __init__(self):
         self.data_min = None
         self.step_size = None
 
-    def uniform_quantization(array: np.ndarray) -> np.ndarray:
+    def uniform_quantization(self, array: np.ndarray) -> list:
         min_val = np.min(array)
         max_val = np.max(array)
         num_bits = 2
@@ -22,17 +24,13 @@ class Quantizator:
         
         return [quantized_array, q_step, min_val]
 
-    def dequantize(self, quantized: np.ndarray) -> np.ndarray:
+    def dequantize(self, quantized: np.ndarray, q_step: np.float64, min_val: np.float64) -> np.ndarray:
 
-        array = np.random.rand(5, 5, 5) * 1000
+        quantized_array, step, val = self.uniform_quantization(quantized)
 
-        quantized_array, step, val = self.uniform_quantization(array)
+        unquantized_array = quantized_array * q_step + min_val
 
-        unquantized_array = quantized_array * step + val
-
-        # Вывод исходного и квантованного массива
-        print(step, val, np.max(quantized_array))
-        print(np.mean((array - unquantized_array) ** 2))
+        return unquantized_array
 
     def mse(self, data: np.ndarray, dequantized: np.ndarray) -> np.float64:
         print(np.mean((data - dequantized   ) ** 2))
