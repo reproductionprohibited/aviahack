@@ -139,8 +139,12 @@ venv.bak/
 /site
 
 /waverange/data
-/waverange/compressed
-/waverange/compressed_high
+*compr_wage
+*compr_step
+
+*compressed
+*compressed_low
+*compressed_high
 
 # mypy
 .mypy_cache/

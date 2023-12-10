@@ -21,15 +21,24 @@ class VelParser:
         }
         return data
 
+    def is_string_float(self, string: str) -> bool:
+        try:
+            float_value = float(string)
+        except ValueError:
+            return False
+
+        return True
+
     def get_vel_data(
         self,
         path_to_vel: str,
     ) -> Dict[str, List[np.ndarray]]:
         parsepath = Path(path_to_vel)
         children = parsepath.iterdir()
-        time_paths = sorted(list(filter(lambda x: 'vel' in str(x), children)))[:-2]
+        time_paths = sorted(list(filter(lambda x: self.is_string_float(str(x)), children)))[:-2]
         veldata = {}
         for time_path in time_paths:
+            print(time_path)
             time_path = Path(time_path)
             p = Ofpp.parse_internal_field(str(time_path) + '/' + 'p')
             t = Ofpp.parse_internal_field(str(time_path) + '/' + 'T')

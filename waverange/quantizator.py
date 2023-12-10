@@ -24,11 +24,11 @@ class Quantizator:
         
         return [quantized_array, q_step, min_val]
 
-    def dequantize(self, quantized: np.ndarray) -> np.ndarray:
+    def dequantize(self, quantized: np.ndarray, q_step: np.float64, min_val: np.float64) -> np.ndarray:
 
         quantized_array, step, val = self.uniform_quantization(quantized)
 
-        unquantized_array = quantized_array * step + val
+        unquantized_array = quantized_array * q_step + min_val
 
         return unquantized_array
 
