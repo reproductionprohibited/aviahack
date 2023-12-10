@@ -21,15 +21,9 @@ class VelParser:
         }
         return data
 
-<<<<<<< HEAD
     def isvalidvelpath(self, string: str) -> bool:
         try:
             float_value = float(string[3:])
-=======
-    def is_string_float(self, string: str) -> bool:
-        try:
-            float_value = float(string)
->>>>>>> d84442cb3ff728cedee451d02ec55be983a9844f
         except ValueError:
             return False
 
@@ -37,16 +31,12 @@ class VelParser:
 
     def get_vel_data(
         self,
-<<<<<<< HEAD
         vel: str = 'vel3.0',
         base_path: str = 'data',
         model: str = 'data_wage',
         dimpath: str = 'low_dim',
-=======
-        path_to_vel: str,
->>>>>>> d84442cb3ff728cedee451d02ec55be983a9844f
     ) -> Dict[str, List[np.ndarray]]:
-        parsepath = Path(path_to_vel)
+        parsepath = Path(f'{base_path}/{model}/{dimpath}/{vel}')
         children = parsepath.iterdir()
         time_paths = sorted(list(filter(lambda x: self.is_string_float(str(x)), children)))[:-2]
         veldata = {}
@@ -79,7 +69,6 @@ class VelParser:
         children = parsepath.iterdir()
         vels = list(filter(lambda x: 'vel' in str(x), children))
         return vels
-<<<<<<< HEAD
     
     def get_all_dim_data(
         self,
@@ -115,5 +104,3 @@ class VelParser:
             'points': mesh.points,
         }
         return dimdata
-=======
->>>>>>> d84442cb3ff728cedee451d02ec55be983a9844f
