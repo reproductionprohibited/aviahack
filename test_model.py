@@ -1,17 +1,16 @@
 import torch 
-from functools import wraps
 from pathlib import Path
-from typing import Union, List
+from typing import Union
 import os
-import json
-from multiprocessing import Pool
-from pprint import pprint
-
 import numpy as np
 import openfoamparser_mai as Ofpp
-import pyvista
 import pandas as pd
-import os 
+from torch_geometric.data import Data 
+from torch_geometric.nn import GCNConv 
+import torch.nn.functional as F 
+from sklearn.neighbors import NearestNeighbors 
+from sklearn.preprocessing import StandardScaler 
+import argparse
 
 def _face_center_position(points: list, mesh: Ofpp.FoamMesh) -> list:
     vertecis = [mesh.points[p] for p in points]
@@ -83,7 +82,7 @@ def pressure_field_on_surface(solver_path: Union[str, os.PathLike, Path],
         return surfaces
 
 
-def parse_data(cat):
+def parse_data(cat: str) -> pd.DataFrame:
     vels = {
         '0.6M': [203.4030334563726, 17.795459554216844, 0],
         '0.7M': [230.09319108031895, 61.65328473387146, 0],
@@ -104,8 +103,6 @@ def parse_data(cat):
     p_path = time_path / Path('p')
     p = Ofpp.parse_internal_field(p_path)
     surface = pressure_field_on_surface(base_path, p)
-    
-    
 
     x = []
     y = []
@@ -125,20 +122,7 @@ def parse_data(cat):
     return df
 
 
-
-import pandas as pd 
-import torch 
-from torch_geometric.data import Data 
-from torch_geometric.nn import GCNConv 
-import torch.nn.functional as F 
-from sklearn.neighbors import NearestNeighbors 
-from sklearn.utils import shuffle 
-from sklearn.preprocessing import StandardScaler 
-from sklearn.model_selection import train_test_split 
-from torch.optim.lr_scheduler import ReduceLROnPlateau 
-import joblib
-
-def create_edge_index(features, k=5): 
+def create_edge_index(features: np.ndarray, k=5) -> torch.tensor: 
     nbrs = NearestNeighbors(n_neighbors=k, algorithm='ball_tree').fit(features[:, :3]) 
     _, indices = nbrs.kneighbors(features[:, :3]) 
  
@@ -174,12 +158,10 @@ def predict(agard_df):
     input_data = agard_df[['x', 'y', 'z', 'v_x', 'v_y', 'v_z']]
     
     scaler = StandardScaler() 
-    features = scaler.fit_transform(input_data[['x', 'y', 'z', 'v_x', 'v_y', 'v_z']].values) 
-    
-    # Создание edge_index для обучающего и валидационного наборов 
+    features = scaler.fit_transform(input_data[['x', 'y', 'z', 'v_x', 'v_y', 'v_z']].values)
+    print(type(features))    
     edge_index_test = create_edge_index(features) 
-    
-    # Преобразование данных в тензоры 
+     
     x_tensor_train = torch.tensor(features, dtype=torch.float) 
     
     model = GCN()
@@ -189,14 +171,16 @@ def predict(agard_df):
     test_out = model(Data(x=x_tensor_train, edge_index=edge_index_test))
     
     return test_out 
-
-
+    
 
 def main():
-    import sys
-    path = sys.argv[1]
+    parser = argparse.ArgumentParser(description='Data Parsing Script')
+
+    parser.add_argument('path', type=str, help=' Путь к папке с данными о конкретной скорости (пример: agard150.0)')
+
+    args = parser.parse_args()
     
-    agard_df = parse_data(path)
+    agard_df = parse_data(args.path)
     
     model = GCN()
     
@@ -207,7 +191,7 @@ def main():
     
     pressures = predict(agard_df).detach()
     
-    np.savetxt("array.txt", pressures)
+    np.savetxt("predictions.txt", pressures)
     
     
 if __name__ == "__main__":
