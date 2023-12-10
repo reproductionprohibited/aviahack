@@ -139,6 +139,8 @@ venv.bak/
 /site
 
 /waverange/data
+/waverange/compressed
+/waverange/compressed_high
 
 # mypy
 .mypy_cache/

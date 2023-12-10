@@ -6,32 +6,39 @@ import openfoamparser_mai as Ofpp
 
 
 class VelParser:
+    def get_mesh_data(
+        self,
+        path_to_vel: str,
+    ) -> Dict[str, List[np.ndarray]]:
+        parsepath = Path(path_to_vel)
+        mesh = Ofpp.FoamMesh(parsepath)
+        data = {
+            'faces': mesh.faces,
+            'neighbour': mesh.neighbour,
+            'owner': mesh.owner,
+            'points': mesh.points,
+            'boundary': mesh.boundary,
+        }
+        return data
+
     def get_vel_data(
         self,
-        vel: str,
-        model: str,
-        base_path: str = 'data',
-        dimpath: str = 'low_dim',
+        path_to_vel: str,
     ) -> Dict[str, List[np.ndarray]]:
-        parsepath = Path(
-            '/'.join([
-                base_path,
-                model,
-                dimpath,
-                vel,
-            ])
-        )
-        time_paths = sorted(list(parsepath.iterdir()))[1:-2]
+        parsepath = Path(path_to_vel)
+        children = parsepath.iterdir()
+        time_paths = sorted(list(filter(lambda x: 'vel' in str(x), children)))[:-2]
         veldata = {}
         for time_path in time_paths:
             time_path = Path(time_path)
-            p = Ofpp.parse_internal_field(time_path / Path('p'))
-            t = Ofpp.parse_internal_field(time_path / Path('T'))
-            u = Ofpp.parse_internal_field(time_path / Path('U'))
-            rho = Ofpp.parse_internal_field(time_path / Path('rho'))
+            p = Ofpp.parse_internal_field(str(time_path) + '/' + 'p')
+            t = Ofpp.parse_internal_field(str(time_path) + '/' + 'T')
+            u = Ofpp.parse_internal_field(str(time_path) + '/' + 'U')
+            rho = Ofpp.parse_internal_field(str(time_path) + '/' + 'rho')
 
             key = str(time_path).split('/')[-1]
             veldata[key] = [p, t, u, rho]
+
         return veldata
 
     def get_vels(
@@ -50,38 +57,3 @@ class VelParser:
         children = parsepath.iterdir()
         vels = list(filter(lambda x: 'vel' in str(x), children))
         return vels
-
-    def get_all_dim_data(
-        self,
-        model: str,
-        base_path: str = 'data',
-        dimpath: str = 'low_dim',
-    ):
-        parsepath = Path(
-            '/'.join([
-                base_path,
-                model,
-                dimpath,
-            ])
-        )
-        dimdata = {}
-
-        for velpath in sorted(list(parsepath.iterdir()))[1:]:
-            velpath = Path(velpath)
-            key = str(velpath).split('/')[-1]
-            dimdata[key] = self.get_vel_data(
-                vel=key,
-                base_path=base_path,
-                model=model,
-                dimpath=dimpath,
-            )
-        mesh: Ofpp.FoamMesh = Ofpp.FoamMesh(parsepath / Path('vel3.0'))
-
-        dimdata['mesh'] = {
-            'faces': mesh.faces,
-            'boundary': mesh.boundary,
-            'neighbour': mesh.neighbour,
-            'owner': mesh.owner,
-            'points': mesh.points,
-        }
-        return dimdata

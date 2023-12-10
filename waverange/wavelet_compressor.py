@@ -19,7 +19,7 @@ class WaveletCompressor:
     def get_size(self, data: np.ndarray):
         return sys.getsizeof(data)
 
-    def wavelet_transform(self, data, level=1):
+    def wavelet_transform(self, data, level=2):
         """ Perform the nD CDF 9/7 wavelet transform """
         coeffs = pywt.wavedecn(data, 'bior2.2', level=level)
         return coeffs
@@ -34,16 +34,16 @@ class WaveletCompressor:
         return np.mean((image1 - image2) ** 2)
 
 
-# image_data = np.array([e, pi, e, pi, e, pi, e, pi], dtype=np.float64)
-image_data = np.random.rand(5, 5, 5) * 1000000
-# print(np.max(image_data))
-# print(np.min(image_data))
-compressor = WaveletCompressor()
+# # image_data = np.array([e, pi, e, pi, e, pi, e, pi], dtype=np.float64)
+# image_data = np.random.rand(5, 5, 5) * 1000000
+# # print(np.max(image_data))
+# # print(np.min(image_data))
+# compressor = WaveletCompressor()
 
-wavelet_coeffs = compressor.wavelet_transform(image_data, level=2)
+# wavelet_coeffs = compressor.wavelet_transform(image_data, level=2)
 
-reconstructed_image = compressor.inverse_wavelet_transform(wavelet_coeffs)
+# reconstructed_image = compressor.inverse_wavelet_transform(wavelet_coeffs)
 
-# print(compressor.mean_squared_error(image_data, reconstructed_image))
-print(compressor.get_size(image_data))
-print(compressor.get_size(wavelet_coeffs))
+# # print(compressor.mean_squared_error(image_data, reconstructed_image))
+# print(compressor.get_size(image_data))
+# print(compressor.get_size(wavelet_coeffs))
