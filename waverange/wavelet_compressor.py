@@ -32,21 +32,3 @@ class WaveletCompressor:
 
     def mean_squared_error(self, image1, image2):
         return np.mean((image1 - image2) ** 2)
-<<<<<<< HEAD
-=======
-
-
-# # image_data = np.array([e, pi, e, pi, e, pi, e, pi], dtype=np.float64)
-# image_data = np.random.rand(5, 5, 5) * 1000000
-# # print(np.max(image_data))
-# # print(np.min(image_data))
-# compressor = WaveletCompressor()
-
-# wavelet_coeffs = compressor.wavelet_transform(image_data, level=2)
-
-# reconstructed_image = compressor.inverse_wavelet_transform(wavelet_coeffs)
-
-# # print(compressor.mean_squared_error(image_data, reconstructed_image))
-# print(compressor.get_size(image_data))
-# print(compressor.get_size(wavelet_coeffs))
->>>>>>> d84442cb3ff728cedee451d02ec55be983a9844f
